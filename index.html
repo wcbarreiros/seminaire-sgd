@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Séminaire d'équipe — SGD Pharma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --blue-900: #042C53;
+    --blue-800: #0C447C;
+    --blue-600: #185FA5;
+    --blue-400: #378ADD;
+    --blue-200: #85B7EB;
+    --blue-100: #B5D4F4;
+    --blue-50:  #E6F1FB;
+    --teal-600: #0F6E56;
+    --teal-50:  #E1F5EE;
+    --amber-600: #854F0B;
+    --amber-50:  #FAEEDA;
+    --pink-600: #993556;
+    --pink-50:  #FBEAF0;
+    --gray-900: #1a1a2e;
+    --gray-700: #2d2d44;
+    --gray-100: #f0f4fa;
+    --gray-50:  #f8fafd;
+    --text: #1a1a2e;
+    --text-muted: #5a6a80;
+    --border: rgba(24,95,165,0.12);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--gray-50);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ─────────────────────────────── */
+  .site-header {
+    background: var(--blue-900);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .site-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: white;
+    letter-spacing: 0.01em;
+  }
+  .site-logo span { color: var(--blue-200); }
+  .site-date {
+    font-size: 12px;
+    color: var(--blue-200);
+    background: rgba(255,255,255,0.08);
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  /* ── PAGES ───────────────────────────────── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── ADMIN ───────────────────────────────── */
+  .admin-hero {
+    background: linear-gradient(135deg, var(--blue-900) 0%, var(--blue-800) 100%);
+    padding: 3rem 2rem 2.5rem;
+    color: white;
+    text-align: center;
+  }
+  .admin-hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px;
+    font-weight: 400;
+    margin-bottom: 0.4rem;
+  }
+  .admin-hero p { color: var(--blue-100); font-size: 14px; }
+
+  .admin-body { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+  .section-title {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--blue-600);
+    margin-bottom: 1rem;
+  }
+
+  .qr-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  @media (min-width: 600px) { .qr-grid { grid-template-columns: repeat(4, 1fr); } }
+
+  .qr-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1rem;
+    text-align: center;
+    transition: box-shadow 0.2s;
+  }
+  .qr-card:hover { box-shadow: 0 4px 20px rgba(24,95,165,0.1); }
+  .avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 500; font-size: 14px;
+    margin: 0 auto 0.75rem;
+  }
+  .qr-name { font-weight: 500; font-size: 14px; margin-bottom: 2px; }
+  .qr-role { font-size: 11px; color: var(--text-muted); margin-bottom: 0.75rem; }
+  .qr-img { display: flex; justify-content: center; margin-bottom: 0.5rem; }
+  .qr-url { font-size: 9px; color: var(--text-muted); word-break: break-all; line-height: 1.3; }
+
+  .status-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .status-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .status-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .status-row:last-child { border-bottom: none; }
+  .status-person { display: flex; align-items: center; gap: 10px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 500;
+  }
+  .badge-blue { background: var(--blue-50); color: var(--blue-800); }
+  .badge-green { background: var(--teal-50); color: var(--teal-600); }
+  .badge-gray { background: var(--gray-100); color: var(--text-muted); }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 20px; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--blue-600);
+    background: white; color: var(--blue-600);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.15s;
+    text-decoration: none;
+  }
+  .btn:hover { background: var(--blue-50); }
+  .btn-primary { background: var(--blue-600); color: white; }
+  .btn-primary:hover { background: var(--blue-800); border-color: var(--blue-800); }
+  .btn-danger { border-color: #c0392b; color: #c0392b; }
+  .btn-danger:hover { background: #fdf0ef; }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* ── VOTE PAGES ──────────────────────────── */
+  .vote-page {
+    max-width: 540px;
+    margin: 0 auto;
+    padding: 1.5rem;
+  }
+  .vote-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 1.5rem;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+  }
+  .voter-info h2 { font-size: 16px; font-weight: 500; }
+  .voter-info p { font-size: 12px; color: var(--text-muted); }
+
+  .step-indicator {
+    margin-left: auto;
+    display: flex; gap: 5px;
+  }
+  .step-dot {
+    width: 28px; height: 5px; border-radius: 3px;
+    background: var(--gray-100);
+    transition: background 0.3s;
+  }
+  .step-dot.active { background: var(--blue-400); }
+  .step-dot.done { background: var(--blue-600); }
+
+  .vote-intro {
+    margin-bottom: 1.25rem;
+  }
+  .vote-intro h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px; font-weight: 400;
+    margin-bottom: 0.25rem;
+  }
+  .vote-intro p { font-size: 13px; color: var(--text-muted); }
+
+  .counter-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 0.75rem;
+    padding: 8px 12px;
+    background: var(--blue-50);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+  }
+  .counter-num { font-weight: 500; color: var(--blue-800); }
+  .counter-num.full { color: #c0392b; }
+  .counter-hint { color: var(--text-muted); font-size: 12px; }
+
+  .items-list {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+  }
+  .item-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.1s;
+    user-select: none;
+  }
+  .item-row:last-child { border-bottom: none; }
+  .item-row:hover { background: var(--gray-50); }
+  .item-row.selected { background: var(--blue-50); }
+  .item-check {
+    width: 20px; height: 20px; flex-shrink: 0;
+    border-radius: 5px;
+    border: 1.5px solid #c8d8e8;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .item-check.checked { background: var(--blue-600); border-color: var(--blue-600); }
+  .item-label { font-size: 14px; flex: 1; }
+
+  .btn-full { width: 100%; justify-content: center; padding: 13px; }
+
+  /* ── MERCI ───────────────────────────────── */
+  .merci-page {
+    max-width: 400px;
+    margin: 4rem auto;
+    text-align: center;
+    padding: 2rem;
+  }
+  .merci-icon {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--teal-50);
+    color: var(--teal-600);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+    margin: 0 auto 1.5rem;
+  }
+  .merci-page h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px; font-weight: 400;
+    margin-bottom: 0.5rem;
+  }
+  .merci-page p { color: var(--text-muted); font-size: 14px; }
+
+  /* ── RESULTS ─────────────────────────────── */
+  .results-hero {
+    background: var(--blue-900);
+    padding: 2.5rem 2rem 2rem;
+    color: white;
+    text-align: center;
+  }
+  .results-hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px; font-weight: 400;
+    margin-bottom: 0.25rem;
+  }
+  .results-hero p { color: var(--blue-100); font-size: 13px; }
+
+  .results-body { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+  .tab-bar {
+    display: flex; gap: 8px;
+    margin-bottom: 1.5rem;
+  }
+  .tab {
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    background: white; color: var(--text-muted);
+    transition: all 0.15s;
+  }
+  .tab.active { background: var(--blue-600); color: white; border-color: var(--blue-600); }
+
+  .results-panel { display: none; }
+  .results-panel.active { display: block; }
+
+  .result-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .result-item:last-child { border-bottom: none; }
+  .result-rank {
+    font-size: 13px; font-weight: 500;
+    color: var(--text-muted);
+    width: 24px; text-align: right; flex-shrink: 0;
+  }
+  .result-rank.top { color: var(--blue-600); }
+  .result-info { flex: 1; }
+  .result-name { font-size: 14px; font-weight: 500; }
+  .result-name.dimmed { font-weight: 400; color: var(--text-muted); }
+  .result-bar-wrap { flex: 1; max-width: 200px; }
+  .result-bar-bg {
+    background: var(--gray-100);
+    border-radius: 4px; height: 6px; overflow: hidden;
+  }
+  .result-bar { height: 6px; border-radius: 4px; background: var(--blue-400); }
+  .result-bar.attention { background: #E07B39; }
+  .result-score {
+    font-size: 12px; color: var(--text-muted);
+    width: 60px; text-align: right; flex-shrink: 0;
+  }
+
+  .top10-divider {
+    display: flex; align-items: center; gap: 10px;
+    margin: 0.5rem 0;
+    font-size: 11px; font-weight: 500; color: var(--blue-600);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .top10-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--blue-100);
+  }
+
+  /* ── NO VOTE WARNING ─────────────────────── */
+  .no-votes {
+    text-align: center; padding: 3rem 1rem; color: var(--text-muted);
+  }
+  .no-votes p { font-size: 14px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-logo">SGD <span>Pharma</span></div>
+  <div class="site-date">Séminaire · 23 mars 2025</div>
+</header>
+
+<!-- ════════════════════════════════════════
+     PAGE ADMIN
+════════════════════════════════════════ -->
+<div class="page active" id="page-admin">
+  <div class="admin-hero">
+    <h1>Interface animateur</h1>
+    <p>Scannez les QR codes et suivez les votes en temps réel</p>
+  </div>
+  <div class="admin-body">
+
+    <p class="section-title">QR codes participants</p>
+    <div class="qr-grid" id="qr-grid"></div>
+
+    <p class="section-title">Statut des votes</p>
+    <div class="status-card">
+      <div class="status-header">
+        <span style="font-weight:500">Participants</span>
+        <span class="badge badge-blue" id="vote-count-badge">0 / 4 votés</span>
+      </div>
+      <div id="vote-status-list"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goResults()">Projeter les résultats →</button>
+      <button class="btn btn-danger" onclick="resetAll()">Réinitialiser</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PAGE VOTE — QUALITÉS
+════════════════════════════════════════ -->
+<div class="page" id="page-vote-q">
+  <div class="vote-page">
+    <div class="vote-header">
+      <div class="avatar" id="av-q"></div>
+      <div class="voter-info">
+        <h2 id="voter-name-q"></h2>
+        <p>Étape 1 sur 2 · Qualités</p>
+      </div>
+      <div class="step-indicator">
+        <div class="step-dot active" id="sq1"></div>
+        <div class="step-dot" id="sq2"></div>
+      </div>
+    </div>
+
+    <div class="vote-intro">
+      <h3>Qualités de l'équipe</h3>
+      <p>Sélectionnez les <strong>10 qualités</strong> les plus importantes pour notre fonctionnement collectif.</p>
+    </div>
+
+    <div class="counter-bar">
+      <span class="counter-num" id="q-count">0 / 10 sélectionnées</span>
+      <span class="counter-hint">Exactement 10 requises</span>
+    </div>
+
+    <div class="items-list" id="list-qualites"></div>
+
+    <button class="btn btn-primary btn-full" id="btn-next-q" onclick="goToDefauts()" disabled>
+      Suivant →
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PAGE VOTE — POINTS D'ATTENTION
+════════════════════════════════════════ -->
+<div class="page" id="page-vote-d">
+  <div class="vote-page">
+    <div class="vote-header">
+      <div class="avatar" id="av-d"></div>
+      <div class="voter-info">
+        <h2 id="voter-name-d"></h2>
+        <p>Étape 2 sur 2 · Points d'attention</p>
+      </div>
+      <div class="step-indicator">
+        <div class="step-dot done"></div>
+        <div class="step-dot active"></div>
+      </div>
+    </div>
+
+    <div class="vote-intro">
+      <h3>Points d'attention</h3>
+      <p>Sélectionnez les <strong>10 points</strong> les plus importants à travailler en priorité.</p>
+    </div>
+
+    <div class="counter-bar">
+      <span class="counter-num" id="d-count">0 / 10 sélectionnés</span>
+      <span class="counter-hint">Exactement 10 requis</span>
+    </div>
+
+    <div class="items-list" id="list-defauts"></div>
+
+    <button class="btn btn-primary btn-full" id="btn-submit" onclick="submitVote()" disabled>
+      Valider mon vote ✓
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PAGE MERCI
+════════════════════════════════════════ -->
+<div class="page" id="page-merci">
+  <div class="merci-page">
+    <div class="merci-icon">✓</div>
+    <h1 id="merci-name">Merci !</h1>
+    <p>Votre vote a bien été enregistré.<br>L'animateur projettera les résultats collectifs à la fin du vote.</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PAGE RÉSULTATS (PROJETÉ)
+════════════════════════════════════════ -->
+<div class="page" id="page-results">
+  <div class="results-hero">
+    <h1>Résultats collectifs</h1>
+    <p id="results-subtitle">—</p>
+  </div>
+  <div class="results-body">
+    <div class="tab-bar">
+      <div class="tab active" onclick="switchTab('q')">Qualités</div>
+      <div class="tab" onclick="switchTab('d')">Points d'attention</div>
+    </div>
+
+    <div class="results-panel active" id="panel-q">
+      <div id="results-q-inner"></div>
+    </div>
+    <div class="results-panel" id="panel-d">
+      <div id="results-d-inner"></div>
+    </div>
+
+    <div class="btn-row" style="margin-top:2rem">
+      <button class="btn" onclick="showPage('page-admin')">← Retour animateur</button>
+      <button class="btn btn-primary" onclick="exportResults()">Exporter top 10</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PARTICIPANTS = [
+  { name: 'Cardoso',  role: 'Responsable',    initials: 'CB', bg: '#042C53', color: '#B5D4F4' },
+  { name: 'Eddy',    role: 'Adjoint',         initials: 'DE', bg: '#085041', color: '#9FE1CB' },
+  { name: 'Ilhame',  role: 'Ing. Généraliste',initials: 'II', bg: '#633806', color: '#FAC775' },
+  { name: 'Silvain', role: 'Ing. Production', initials: 'TS', bg: '#72243E', color: '#F4C0D1' },
+];
+
+const QUALITES = [
+  'Écoute active','Communication claire','Ponctualité','Proactivité','Adaptabilité',
+  'Empathie','Rigueur technique','Créativité','Esprit d\'équipe','Autonomie',
+  'Responsabilité','Transparence','Fiabilité','Résilience','Donner du feedback',
+  'Recevoir du feedback','Prise de décision','Gestion du stress','Organisation','Priorisation',
+  'Curiosité intellectuelle','Humilité','Courage de s\'exprimer','Sens de l\'urgence','Pédagogie',
+  'Leadership naturel','Reconnaître le travail des autres','Loyauté','Enthousiasme','Persévérance',
+  'Savoir déléguer','Gestion des conflits','Vision à long terme','Attention aux détails','Ouverture au changement',
+  'Sens de la responsabilité collective','Capacité de synthèse','Initiative','Équilibre émotionnel','Sens de la justice',
+  'Engagement','Esprit critique constructif','Apprendre rapidement','Présence et disponibilité','Clarté des priorités',
+  'Sens de l\'humour sain','Solidarité','Éthique professionnelle','Focus sur les résultats','Mobiliser les autres'
+];
+
+const DEFAUTS = [
+  'Communication imprécise','Éviter les conflits','Difficulté à déléguer','Impulsivité','Procrastination',
+  'Résistance au feedback','Perfectionnisme bloquant','Manque d\'écoute','Travailler en silos','Difficulté à prioriser',
+  'Manque de suivi','Réactivité excessive','Difficulté à dire non','Rejeter la faute sur les autres','Peu de visibilité sur son travail',
+  'Manque de ponctualité','Agressivité sous pression','Peu d\'initiative','Refus des décisions collectives','Tendance au pessimisme',
+  'Rigidité de position','Manque de transparence','Difficulté à demander de l\'aide','Minimiser les problèmes','Mauvaise gestion du stress',
+  'Résistance au changement','Manque de reconnaissance envers les autres','Monopoliser la parole','Peu d\'attention aux détails','Difficulté à travailler sous pression',
+  'Manque de rigueur documentaire','Résistance aux nouvelles idées','Non-respect des délais','Tendance à l\'isolement','Manque de clarté dans les attentes',
+  'Difficulté à donner un feedback difficile','Peu de présence en situation critique','Contourner les règles','Parler négativement des collègues','Manque de préparation',
+  'Difficulté à reconnaître ses erreurs','Tendance à se disperser','Peu de proactivité','Difficulté à mobiliser l\'équipe','Manque d\'alignement collectif',
+  'Réagir plutôt qu\'anticiper','Peu de curiosité sur le travail des autres','Perdre son calme en crise','Décider seul','Manque d\'engagement visible'
+];
+
+let votes = {};
+let currentVoter = null;
+let selQ = [], selD = [];
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function getBaseUrl() {
+  return window.location.href.split('?')[0];
+}
+
+/* ── ADMIN ─────────────────────────────── */
+function buildAdmin() {
+  buildQRGrid();
+  updateVoteStatus();
+}
+
+function buildQRGrid() {
+  const grid = document.getElementById('qr-grid');
+  grid.innerHTML = '';
+  PARTICIPANTS.forEach(p => {
+    const url = getBaseUrl() + '?voter=' + encodeURIComponent(p.name);
+    const card = document.createElement('div');
+    card.className = 'qr-card';
+    card.innerHTML = `
+      <div class="avatar" style="background:${p.bg};color:${p.color}">${p.initials}</div>
+      <div class="qr-name">${p.name}</div>
+      <div class="qr-role">${p.role}</div>
+      <div class="qr-img" id="qr-${p.name}"></div>
+      <div class="qr-url">${url}</div>
+    `;
+    grid.appendChild(card);
+    setTimeout(() => {
+      try {
+        new QRCode(document.getElementById('qr-' + p.name), {
+          text: url, width: 90, height: 90,
+          colorDark: '#042C53', colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } catch(e) {}
+    }, 100);
+  });
+}
+
+function updateVoteStatus() {
+  const count = Object.keys(votes).length;
+  document.getElementById('vote-count-badge').textContent = count + ' / 4 votés';
+  const list = document.getElementById('vote-status-list');
+  list.innerHTML = PARTICIPANTS.map(p => {
+    const done = !!votes[p.name];
+    return `<div class="status-row">
+      <div class="status-person">
+        <div class="avatar" style="background:${p.bg};color:${p.color};width:34px;height:34px;font-size:12px">${p.initials}</div>
+        <span style="font-size:14px;font-weight:500">${p.name}</span>
+        <span style="font-size:12px;color:var(--text-muted)">${p.role}</span>
+      </div>
+      ${done
+        ? '<span class="badge badge-green">✓ Voté</span>'
+        : '<span class="badge badge-gray">En attente</span>'}
+    </div>`;
+  }).join('');
+}
+
+/* ── VOTE ──────────────────────────────── */
+function setupVotePage() {
+  selQ = []; selD = [];
+  const p = PARTICIPANTS.find(x => x.name === currentVoter);
+  if (!p) return;
+  ['q','d'].forEach(t => {
+    document.getElementById('voter-name-' + t).textContent = p.name;
+    const av = document.getElementById('av-' + t);
+    av.textContent = p.initials;
+    av.style.background = p.bg;
+    av.style.color = p.color;
+  });
+  renderList('list-qualites', QUALITES, selQ, 'q');
+  updateCounter('q');
+  showPage('page-vote-q');
+}
+
+function renderList(containerId, items, sel, type) {
+  document.getElementById(containerId).innerHTML = items.map((item, i) => `
+    <div class="item-row ${sel.includes(i) ? 'selected' : ''}" onclick="toggleItem(${i},'${type}')">
+      <div class="item-check ${sel.includes(i) ? 'checked' : ''}" id="chk-${type}-${i}">
+        ${sel.includes(i) ? '<svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1,5 4,8 9,2" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>' : ''}
+      </div>
+      <span class="item-label">${item}</span>
+    </div>
+  `).join('');
+}
+
+function toggleItem(i, type) {
+  const sel = type === 'q' ? selQ : selD;
+  const idx = sel.indexOf(i);
+  if (idx > -1) { sel.splice(idx, 1); }
+  else { if (sel.length >= 10) return; sel.push(i); }
+  const list = type === 'q' ? QUALITES : DEFAUTS;
+  renderList(type === 'q' ? 'list-qualites' : 'list-defauts', list, sel, type);
+  updateCounter(type);
+}
+
+function updateCounter(type) {
+  const sel = type === 'q' ? selQ : selD;
+  const el = document.getElementById(type + '-count');
+  el.textContent = sel.length + ' / 10 sélectionné' + (type === 'q' ? 'es' : 's');
+  el.className = 'counter-num' + (sel.length === 10 ? ' full' : '');
+  const btn = document.getElementById(type === 'q' ? 'btn-next-q' : 'btn-submit');
+  btn.disabled = sel.length !== 10;
+}
+
+function goToDefauts() {
+  renderList('list-defauts', DEFAUTS, selD, 'd');
+  updateCounter('d');
+  showPage('page-vote-d');
+}
+
+function submitVote() {
+  votes[currentVoter] = { qualites: [...selQ], defauts: [...selD] };
+  document.getElementById('merci-name').textContent = 'Merci ' + currentVoter + ' !';
+  showPage('page-merci');
+  updateVoteStatus();
+}
+
+/* ── RESULTS ───────────────────────────── */
+function goResults() {
+  buildResults();
+  showPage('page-results');
+}
+
+function buildResults() {
+  const voterCount = Object.keys(votes).length;
+  document.getElementById('results-subtitle').textContent =
+    voterCount + ' participant' + (voterCount > 1 ? 's ont' : ' a') + ' voté';
+
+  const qS = new Array(QUALITES.length).fill(0);
+  const dS = new Array(DEFAUTS.length).fill(0);
+  Object.values(votes).forEach(v => {
+    v.qualites.forEach(i => qS[i]++);
+    v.defauts.forEach(i => dS[i]++);
+  });
+
+  const sortedQ = qS.map((s,i) => ({label: QUALITES[i], score: s})).sort((a,b) => b.score - a.score);
+  const sortedD = dS.map((s,i) => ({label: DEFAUTS[i], score: s})).sort((a,b) => b.score - a.score);
+
+  if (voterCount === 0) {
+    document.getElementById('results-q-inner').innerHTML = '<div class="no-votes"><p>Aucun vote enregistré pour l\'instant.</p></div>';
+    document.getElementById('results-d-inner').innerHTML = '<div class="no-votes"><p>Aucun vote enregistré pour l\'instant.</p></div>';
+    return;
+  }
+
+  document.getElementById('results-q-inner').innerHTML = renderBars(sortedQ, voterCount, 'qualite');
+  document.getElementById('results-d-inner').innerHTML = renderBars(sortedD, voterCount, 'attention');
+}
+
+function renderBars(items, total, type) {
+  const max = Math.max(...items.map(x => x.score), 1);
+  return items.map((item, idx) => {
+    const isTop = idx < 10;
+    const pct = Math.round(item.score / total * 100);
+    const divider = idx === 10 ? '<div class="top10-divider">Autres choix</div>' : '';
+    return divider + `<div class="result-item" style="opacity:${isTop ? 1 : 0.4}">
+      <div class="result-rank ${isTop ? 'top' : ''}">${idx + 1}</div>
+      <div class="result-info">
+        <div class="result-name ${isTop ? '' : 'dimmed'}">${item.label}</div>
+      </div>
+      <div class="result-bar-wrap">
+        <div class="result-bar-bg">
+          <div class="result-bar ${type === 'attention' ? 'attention' : ''}" style="width:${Math.round(item.score/max*100)}%"></div>
+        </div>
+      </div>
+      <div class="result-score">${item.score} vote${item.score>1?'s':''} · ${pct}%</div>
+    </div>`;
+  }).join('');
+}
+
+function switchTab(type) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&type==='q')||(i===1&&type==='d')));
+  document.getElementById('panel-q').classList.toggle('active', type === 'q');
+  document.getElementById('panel-d').classList.toggle('active', type === 'd');
+}
+
+function exportResults() {
+  const voterCount = Object.keys(votes).length;
+  const qS = new Array(QUALITES.length).fill(0);
+  const dS = new Array(DEFAUTS.length).fill(0);
+  Object.values(votes).forEach(v => {
+    v.qualites.forEach(i => qS[i]++);
+    v.defauts.forEach(i => dS[i]++);
+  });
+  const topQ = qS.map((s,i) => ({label:QUALITES[i],score:s})).sort((a,b)=>b.score-a.score).slice(0,10);
+  const topD = dS.map((s,i) => ({label:DEFAUTS[i],score:s})).sort((a,b)=>b.score-a.score).slice(0,10);
+  let txt = 'RÉSULTATS DU VOTE — SGD Pharma\n';
+  txt += 'Séminaire du 23 mars 2025\n';
+  txt += voterCount + ' participant(s)\n';
+  txt += '\n══ TOP 10 QUALITÉS ══\n';
+  topQ.forEach((x,i) => txt += (i+1) + '. ' + x.label + ' (' + x.score + ' vote' + (x.score>1?'s':'') + ')\n');
+  txt += '\n══ TOP 10 POINTS D\'ATTENTION ══\n';
+  topD.forEach((x,i) => txt += (i+1) + '. ' + x.label + ' (' + x.score + ' vote' + (x.score>1?'s':'') + ')\n');
+  const blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'resultats-vote-sgd.txt';
+  a.click();
+}
+
+function resetAll() {
+  if (confirm('Réinitialiser tous les votes ?')) {
+    votes = {};
+    updateVoteStatus();
+  }
+}
+
+/* ── ROUTER ────────────────────────────── */
+const urlParams = new URLSearchParams(window.location.search);
+const voterParam = urlParams.get('voter');
+if (voterParam && PARTICIPANTS.find(p => p.name === voterParam)) {
+  currentVoter = voterParam;
+  if (votes[currentVoter]) {
+    document.getElementById('merci-name').textContent = 'Merci ' + currentVoter + ' !';
+    showPage('page-merci');
+  } else {
+    setupVotePage();
+  }
+} else {
+  buildAdmin();
+}
+</script>
+</body>
+</html>

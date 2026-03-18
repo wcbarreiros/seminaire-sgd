@@ -73,6 +73,68 @@
   .page { display: none; }
   .page.active { display: block; }
 
+  /* ── LOADING OVERLAY ─────────────────────── */
+  .loading-overlay {
+    position: fixed; inset: 0;
+    background: rgba(255,255,255,0.85);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 999;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .loading-overlay.hidden { display: none; }
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--blue-100);
+    border-top-color: var(--blue-600);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-overlay p { font-size: 13px; color: var(--text-muted); }
+
+  /* ── SETUP BANNER ────────────────────────── */
+  .setup-banner {
+    background: #FEF3C7;
+    border: 1px solid #F59E0B;
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    font-size: 13px;
+    color: #92400E;
+  }
+  .setup-banner strong { display: block; margin-bottom: 4px; font-size: 14px; }
+  .setup-banner code {
+    background: rgba(0,0,0,0.06);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    word-break: break-all;
+  }
+  .setup-banner input {
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px 10px;
+    border: 1.5px solid #F59E0B;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: monospace;
+    background: white;
+    color: #1a1a2e;
+  }
+  .setup-banner .setup-row { display: flex; gap: 8px; margin-top: 8px; }
+  .setup-banner button {
+    padding: 8px 14px;
+    background: #185FA5;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .setup-banner button:hover { background: #0C447C; }
+
   /* ── ADMIN ───────────────────────────────── */
   .admin-hero {
     background: linear-gradient(135deg, var(--blue-900) 0%, var(--blue-800) 100%);
@@ -351,9 +413,31 @@
     text-align: center; padding: 3rem 1rem; color: var(--text-muted);
   }
   .no-votes p { font-size: 14px; }
+
+  /* ── AUTO-REFRESH INDICATOR ──────────────── */
+  .refresh-indicator {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--text-muted);
+    margin-top: 0.5rem;
+  }
+  .refresh-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--teal-600);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
 </style>
 </head>
 <body>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <p id="loading-msg">Chargement…</p>
+</div>
 
 <header class="site-header">
   <div class="site-logo">SGD <span>Pharma</span></div>
@@ -370,6 +454,21 @@
   </div>
   <div class="admin-body">
 
+    <!-- Setup banner (hidden once configured) -->
+    <div class="setup-banner" id="setup-banner">
+      <strong>⚙️ Configuration requise (une seule fois)</strong>
+      Pour que les votes soient sauvegardés entre appareils, collez votre clé JSONBin.io ci-dessous.<br>
+      <small>Créez un compte gratuit sur <strong>jsonbin.io</strong> → API Keys → Create Access Key (cochez <em>Read</em> et <em>Write</em>) → copiez la clé.</small>
+      <div class="setup-row">
+        <input type="text" id="bin-key-input" placeholder="$2a$10$… (votre clé JSONBin)" />
+        <button onclick="saveBinKey()">Enregistrer</button>
+      </div>
+      <div style="margin-top:8px;font-size:12px">
+        BIN ID actuel : <code id="bin-id-display">—</code>
+        <button onclick="createNewBin()" style="margin-left:8px;padding:4px 10px;font-size:12px">Créer un nouveau Bin</button>
+      </div>
+    </div>
+
     <p class="section-title">QR codes participants</p>
     <div class="qr-grid" id="qr-grid"></div>
 
@@ -377,9 +476,16 @@
     <div class="status-card">
       <div class="status-header">
         <span style="font-weight:500">Participants</span>
-        <span class="badge badge-blue" id="vote-count-badge">0 / 4 votés</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="badge badge-blue" id="vote-count-badge">0 / 4 votés</span>
+          <button class="btn" style="padding:5px 12px;font-size:12px" onclick="loadVotes(true)">⟳ Rafraîchir</button>
+        </div>
       </div>
       <div id="vote-status-list"></div>
+      <div class="refresh-indicator" id="refresh-indicator" style="display:none">
+        <div class="refresh-dot"></div>
+        <span>Actualisation automatique toutes les 15 s</span>
+      </div>
     </div>
 
     <div class="btn-row">
@@ -499,11 +605,14 @@
 </div>
 
 <script>
+/* ═══════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════ */
 const PARTICIPANTS = [
-  { name: 'Cardoso',  role: 'Responsable',    initials: 'CB', bg: '#042C53', color: '#B5D4F4' },
-  { name: 'Eddy',    role: 'Adjoint',         initials: 'DE', bg: '#085041', color: '#9FE1CB' },
-  { name: 'Ilhame',  role: 'Ing. Généraliste',initials: 'II', bg: '#633806', color: '#FAC775' },
-  { name: 'Silvain', role: 'Ing. Production', initials: 'TS', bg: '#72243E', color: '#F4C0D1' },
+  { name: 'Cardoso',  role: 'Responsable',     initials: 'CB', bg: '#042C53', color: '#B5D4F4' },
+  { name: 'Eddy',    role: 'Adjoint',          initials: 'DE', bg: '#085041', color: '#9FE1CB' },
+  { name: 'Ilhame',  role: 'Ing. Généraliste', initials: 'II', bg: '#633806', color: '#FAC775' },
+  { name: 'Silvain', role: 'Ing. Production',  initials: 'TS', bg: '#72243E', color: '#F4C0D1' },
 ];
 
 const QUALITES = [
@@ -532,24 +641,176 @@ const DEFAUTS = [
   'Réagir plutôt qu\'anticiper','Peu de curiosité sur le travail des autres','Perdre son calme en crise','Décider seul','Manque d\'engagement visible'
 ];
 
+/* ═══════════════════════════════════════════
+   JSONBIN.IO PERSISTENCE
+   
+   How it works:
+   - votes are stored in a free JSONBin.io "bin" (a tiny JSON database)
+   - The BIN ID and API KEY are stored in localStorage (per browser/device)
+   - Admin page auto-refreshes every 15s to see new votes in real time
+═══════════════════════════════════════════ */
+
+const STORAGE_KEY_BIN  = 'sgd_bin_id';
+const STORAGE_KEY_API  = 'sgd_bin_apikey';
+const JSONBIN_BASE     = 'https://api.jsonbin.io/v3';
+
 let votes = {};
 let currentVoter = null;
 let selQ = [], selD = [];
+let autoRefreshTimer = null;
 
+/* ── helpers ── */
+function getBinId()  { return localStorage.getItem(STORAGE_KEY_BIN)  || ''; }
+function getApiKey() { return localStorage.getItem(STORAGE_KEY_API)  || ''; }
+
+function showLoading(msg) {
+  document.getElementById('loading-msg').textContent = msg || 'Chargement…';
+  document.getElementById('loading-overlay').classList.remove('hidden');
+}
+function hideLoading() {
+  document.getElementById('loading-overlay').classList.add('hidden');
+}
+
+/* ── check if configured ── */
+function isConfigured() {
+  return getBinId() && getApiKey();
+}
+
+function updateSetupBanner() {
+  const banner = document.getElementById('setup-banner');
+  const binDisplay = document.getElementById('bin-id-display');
+  binDisplay.textContent = getBinId() || '—';
+  if (isConfigured()) {
+    banner.style.display = 'none';
+    document.getElementById('refresh-indicator').style.display = 'flex';
+  } else {
+    banner.style.display = 'block';
+    document.getElementById('refresh-indicator').style.display = 'none';
+  }
+}
+
+function saveBinKey() {
+  const key = document.getElementById('bin-key-input').value.trim();
+  if (!key) { alert('Collez votre clé API JSONBin.io.'); return; }
+  localStorage.setItem(STORAGE_KEY_API, key);
+  updateSetupBanner();
+  if (!getBinId()) {
+    createNewBin();
+  } else {
+    loadVotes(true);
+  }
+}
+
+/* ── create a new bin ── */
+async function createNewBin() {
+  const key = getApiKey();
+  if (!key) { alert('Enregistrez d\'abord votre clé API.'); return; }
+  showLoading('Création du bin…');
+  try {
+    const res = await fetch(`${JSONBIN_BASE}/b`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': key,
+        'X-Bin-Name': 'sgd-votes',
+        'X-Bin-Private': 'false'
+      },
+      body: JSON.stringify({ votes: {} })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const newId = data.metadata.id;
+    localStorage.setItem(STORAGE_KEY_BIN, newId);
+    votes = {};
+    updateSetupBanner();
+    updateVoteStatus();
+    startAutoRefresh();
+    alert('✅ Bin créé ! ID : ' + newId + '\nPartagez ce fichier index.html — tout le monde utilisera le même bin automatiquement dès que vous configurerez la même clé.');
+  } catch(e) {
+    alert('Erreur lors de la création du bin : ' + e.message);
+  } finally {
+    hideLoading();
+  }
+}
+
+/* ── load votes from bin ── */
+async function loadVotes(showSpinner) {
+  if (!isConfigured()) { hideLoading(); return; }
+  if (showSpinner) showLoading('Récupération des votes…');
+  try {
+    const res = await fetch(`${JSONBIN_BASE}/b/${getBinId()}/latest`, {
+      headers: { 'X-Master-Key': getApiKey() }
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    votes = data.record.votes || {};
+    updateVoteStatus();
+  } catch(e) {
+    console.warn('loadVotes error:', e.message);
+  } finally {
+    if (showSpinner) hideLoading();
+  }
+}
+
+/* ── save votes to bin ── */
+async function saveVotes() {
+  if (!isConfigured()) {
+    // Fallback: save to localStorage if not configured
+    localStorage.setItem('sgd_votes_local', JSON.stringify(votes));
+    return;
+  }
+  showLoading('Enregistrement…');
+  try {
+    const res = await fetch(`${JSONBIN_BASE}/b/${getBinId()}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': getApiKey()
+      },
+      body: JSON.stringify({ votes })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+  } catch(e) {
+    alert('Erreur lors de la sauvegarde : ' + e.message + '\nVotre vote est sauvegardé localement.');
+    localStorage.setItem('sgd_votes_local', JSON.stringify(votes));
+  } finally {
+    hideLoading();
+  }
+}
+
+/* ── auto-refresh on admin page ── */
+function startAutoRefresh() {
+  stopAutoRefresh();
+  if (!isConfigured()) return;
+  autoRefreshTimer = setInterval(() => {
+    if (document.getElementById('page-admin').classList.contains('active')) {
+      loadVotes(false);
+    }
+  }, 15000);
+}
+function stopAutoRefresh() {
+  if (autoRefreshTimer) { clearInterval(autoRefreshTimer); autoRefreshTimer = null; }
+}
+
+/* ═══════════════════════════════════════════
+   UI
+═══════════════════════════════════════════ */
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  window.scrollTo(0,0);
+  window.scrollTo(0, 0);
 }
 
 function getBaseUrl() {
   return window.location.href.split('?')[0];
 }
 
-/* ── ADMIN ─────────────────────────────── */
+/* ── ADMIN ── */
 function buildAdmin() {
+  updateSetupBanner();
   buildQRGrid();
   updateVoteStatus();
+  startAutoRefresh();
 }
 
 function buildQRGrid() {
@@ -598,7 +859,7 @@ function updateVoteStatus() {
   }).join('');
 }
 
-/* ── VOTE ──────────────────────────────── */
+/* ── VOTE ── */
 function setupVotePage() {
   selQ = []; selD = [];
   const p = PARTICIPANTS.find(x => x.name === currentVoter);
@@ -651,17 +912,21 @@ function goToDefauts() {
   showPage('page-vote-d');
 }
 
-function submitVote() {
+async function submitVote() {
+  // Load latest votes first to avoid overwriting other votes
+  await loadVotes(false);
   votes[currentVoter] = { qualites: [...selQ], defauts: [...selD] };
+  await saveVotes();
   document.getElementById('merci-name').textContent = 'Merci ' + currentVoter + ' !';
   showPage('page-merci');
-  updateVoteStatus();
 }
 
-/* ── RESULTS ───────────────────────────── */
+/* ── RESULTS ── */
 function goResults() {
-  buildResults();
-  showPage('page-results');
+  loadVotes(true).then(() => {
+    buildResults();
+    showPage('page-results');
+  });
 }
 
 function buildResults() {
@@ -740,27 +1005,48 @@ function exportResults() {
   a.click();
 }
 
-function resetAll() {
-  if (confirm('Réinitialiser tous les votes ?')) {
-    votes = {};
-    updateVoteStatus();
-  }
+async function resetAll() {
+  if (!confirm('Réinitialiser tous les votes ?')) return;
+  votes = {};
+  await saveVotes();
+  updateVoteStatus();
 }
 
-/* ── ROUTER ────────────────────────────── */
-const urlParams = new URLSearchParams(window.location.search);
-const voterParam = urlParams.get('voter');
-if (voterParam && PARTICIPANTS.find(p => p.name === voterParam)) {
-  currentVoter = voterParam;
-  if (votes[currentVoter]) {
-    document.getElementById('merci-name').textContent = 'Merci ' + currentVoter + ' !';
-    showPage('page-merci');
-  } else {
-    setupVotePage();
+/* ═══════════════════════════════════════════
+   ROUTER — runs on page load
+═══════════════════════════════════════════ */
+(async function init() {
+  showLoading('Chargement…');
+
+  // Try to recover locally-saved votes if JSONBin not configured yet
+  const localBackup = localStorage.getItem('sgd_votes_local');
+  if (localBackup) {
+    try { votes = JSON.parse(localBackup); } catch(e) {}
   }
-} else {
-  buildAdmin();
-}
+
+  const urlParams  = new URLSearchParams(window.location.search);
+  const voterParam = urlParams.get('voter');
+
+  if (voterParam && PARTICIPANTS.find(p => p.name === voterParam)) {
+    // ── VOTER FLOW ──
+    currentVoter = voterParam;
+    // Load latest votes to check if this person already voted
+    await loadVotes(false);
+    hideLoading();
+    if (votes[currentVoter]) {
+      document.getElementById('merci-name').textContent = 'Merci ' + currentVoter + ' !';
+      showPage('page-merci');
+    } else {
+      setupVotePage();
+    }
+  } else {
+    // ── ADMIN FLOW ──
+    await loadVotes(false);
+    hideLoading();
+    buildAdmin();
+    showPage('page-admin');
+  }
+})();
 </script>
 </body>
 </html>

@@ -263,9 +263,7 @@
   .step-dot.active { background: var(--blue-400); }
   .step-dot.done { background: var(--blue-600); }
 
-  .vote-intro {
-    margin-bottom: 1.25rem;
-  }
+  .vote-intro { margin-bottom: 1.25rem; }
   .vote-intro h3 {
     font-family: 'DM Serif Display', serif;
     font-size: 22px; font-weight: 400;
@@ -353,10 +351,7 @@
 
   .results-body { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
 
-  .tab-bar {
-    display: flex; gap: 8px;
-    margin-bottom: 1.5rem;
-  }
+  .tab-bar { display: flex; gap: 8px; margin-bottom: 1.5rem; }
   .tab {
     padding: 8px 18px;
     border-radius: 20px;
@@ -377,26 +372,16 @@
     border-bottom: 1px solid var(--border);
   }
   .result-item:last-child { border-bottom: none; }
-  .result-rank {
-    font-size: 13px; font-weight: 500;
-    color: var(--text-muted);
-    width: 24px; text-align: right; flex-shrink: 0;
-  }
+  .result-rank { font-size: 13px; font-weight: 500; color: var(--text-muted); width: 24px; text-align: right; flex-shrink: 0; }
   .result-rank.top { color: var(--blue-600); }
   .result-info { flex: 1; }
   .result-name { font-size: 14px; font-weight: 500; }
   .result-name.dimmed { font-weight: 400; color: var(--text-muted); }
   .result-bar-wrap { flex: 1; max-width: 200px; }
-  .result-bar-bg {
-    background: var(--gray-100);
-    border-radius: 4px; height: 6px; overflow: hidden;
-  }
+  .result-bar-bg { background: var(--gray-100); border-radius: 4px; height: 6px; overflow: hidden; }
   .result-bar { height: 6px; border-radius: 4px; background: var(--blue-400); }
   .result-bar.attention { background: #E07B39; }
-  .result-score {
-    font-size: 12px; color: var(--text-muted);
-    width: 60px; text-align: right; flex-shrink: 0;
-  }
+  .result-score { font-size: 12px; color: var(--text-muted); width: 60px; text-align: right; flex-shrink: 0; }
 
   .top10-divider {
     display: flex; align-items: center; gap: 10px;
@@ -404,17 +389,11 @@
     font-size: 11px; font-weight: 500; color: var(--blue-600);
     letter-spacing: 0.08em; text-transform: uppercase;
   }
-  .top10-divider::after {
-    content: ''; flex: 1; height: 1px; background: var(--blue-100);
-  }
+  .top10-divider::after { content: ''; flex: 1; height: 1px; background: var(--blue-100); }
 
-  /* ── NO VOTE WARNING ─────────────────────── */
-  .no-votes {
-    text-align: center; padding: 3rem 1rem; color: var(--text-muted);
-  }
+  .no-votes { text-align: center; padding: 3rem 1rem; color: var(--text-muted); }
   .no-votes p { font-size: 14px; }
 
-  /* ── AUTO-REFRESH INDICATOR ──────────────── */
   .refresh-indicator {
     display: flex; align-items: center; gap: 6px;
     font-size: 11px; color: var(--text-muted);
@@ -425,10 +404,7 @@
     background: var(--teal-600);
     animation: pulse 2s ease-in-out infinite;
   }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 </style>
 </head>
 <body>
@@ -454,13 +430,12 @@
   </div>
   <div class="admin-body">
 
-    <!-- Setup banner (hidden once configured) -->
     <div class="setup-banner" id="setup-banner">
       <strong>⚙️ Configuration requise (une seule fois)</strong>
-      Pour que les votes soient sauvegardés entre appareils, collez votre clé JSONBin.io ci-dessous.<br>
-      <small>Créez un compte gratuit sur <strong>jsonbin.io</strong> → API Keys → Create Access Key (cochez <em>Read</em> et <em>Write</em>) → copiez la clé.</small>
+      Collez votre <strong>X-Master-Key</strong> JSONBin.io ci-dessous pour synchroniser les votes entre appareils.<br>
+      <small>jsonbin.io → API Keys → copiez la <strong>X-MASTER-KEY</strong> (pas la Access Key).</small>
       <div class="setup-row">
-        <input type="text" id="bin-key-input" placeholder="$2a$10$… (votre clé JSONBin)" />
+        <input type="text" id="bin-key-input" placeholder="$2a$10$… (X-Master-Key JSONBin)" />
         <button onclick="saveBinKey()">Enregistrer</button>
       </div>
       <div style="margin-top:8px;font-size:12px">
@@ -511,22 +486,16 @@
         <div class="step-dot" id="sq2"></div>
       </div>
     </div>
-
     <div class="vote-intro">
       <h3>Qualités de l'équipe</h3>
       <p>Sélectionnez les <strong>10 qualités</strong> les plus importantes pour notre fonctionnement collectif.</p>
     </div>
-
     <div class="counter-bar">
       <span class="counter-num" id="q-count">0 / 10 sélectionnées</span>
       <span class="counter-hint">Exactement 10 requises</span>
     </div>
-
     <div class="items-list" id="list-qualites"></div>
-
-    <button class="btn btn-primary btn-full" id="btn-next-q" onclick="goToDefauts()" disabled>
-      Suivant →
-    </button>
+    <button class="btn btn-primary btn-full" id="btn-next-q" onclick="goToDefauts()" disabled>Suivant →</button>
   </div>
 </div>
 
@@ -546,22 +515,16 @@
         <div class="step-dot active"></div>
       </div>
     </div>
-
     <div class="vote-intro">
       <h3>Points d'attention</h3>
       <p>Sélectionnez les <strong>10 points</strong> les plus importants à travailler en priorité.</p>
     </div>
-
     <div class="counter-bar">
       <span class="counter-num" id="d-count">0 / 10 sélectionnés</span>
       <span class="counter-hint">Exactement 10 requis</span>
     </div>
-
     <div class="items-list" id="list-defauts"></div>
-
-    <button class="btn btn-primary btn-full" id="btn-submit" onclick="submitVote()" disabled>
-      Valider mon vote ✓
-    </button>
+    <button class="btn btn-primary btn-full" id="btn-submit" onclick="submitVote()" disabled>Valider mon vote ✓</button>
   </div>
 </div>
 
@@ -589,14 +552,12 @@
       <div class="tab active" onclick="switchTab('q')">Qualités</div>
       <div class="tab" onclick="switchTab('d')">Points d'attention</div>
     </div>
-
     <div class="results-panel active" id="panel-q">
       <div id="results-q-inner"></div>
     </div>
     <div class="results-panel" id="panel-d">
       <div id="results-d-inner"></div>
     </div>
-
     <div class="btn-row" style="margin-top:2rem">
       <button class="btn" onclick="showPage('page-admin')">← Retour animateur</button>
       <button class="btn btn-primary" onclick="exportResults()">Exporter top 10</button>
@@ -644,10 +605,14 @@ const DEFAUTS = [
 /* ═══════════════════════════════════════════
    JSONBIN.IO PERSISTENCE
    
-   How it works:
-   - votes are stored in a free JSONBin.io "bin" (a tiny JSON database)
-   - The BIN ID and API KEY are stored in localStorage (per browser/device)
-   - Admin page auto-refreshes every 15s to see new votes in real time
+   FIX: The BIN ID and API KEY are now embedded in the QR code URLs
+   so participants on any device automatically connect to the same bin.
+   
+   URL format for participants:
+     ?voter=Name&bid=BIN_ID&bkey=API_KEY
+   
+   The admin page still stores credentials in localStorage for convenience,
+   but voters now receive everything they need via the URL.
 ═══════════════════════════════════════════ */
 
 const STORAGE_KEY_BIN  = 'sgd_bin_id';
@@ -659,9 +624,19 @@ let currentVoter = null;
 let selQ = [], selD = [];
 let autoRefreshTimer = null;
 
-/* ── helpers ── */
-function getBinId()  { return localStorage.getItem(STORAGE_KEY_BIN)  || ''; }
-function getApiKey() { return localStorage.getItem(STORAGE_KEY_API)  || ''; }
+// ── URL param helpers (used by voter flow) ──
+const _urlParams = new URLSearchParams(window.location.search);
+function getUrlBinId()  { return _urlParams.get('bid')  || ''; }
+function getUrlApiKey() { return _urlParams.get('bkey') || ''; }
+
+// ── Storage helpers (used by admin flow) ──
+function getBinId()  {
+  // Prefer URL params (voter flow), fall back to localStorage (admin flow)
+  return getUrlBinId()  || localStorage.getItem(STORAGE_KEY_BIN)  || '';
+}
+function getApiKey() {
+  return getUrlApiKey() || localStorage.getItem(STORAGE_KEY_API) || '';
+}
 
 function showLoading(msg) {
   document.getElementById('loading-msg').textContent = msg || 'Chargement…';
@@ -671,7 +646,6 @@ function hideLoading() {
   document.getElementById('loading-overlay').classList.add('hidden');
 }
 
-/* ── check if configured ── */
 function isConfigured() {
   return getBinId() && getApiKey();
 }
@@ -679,7 +653,7 @@ function isConfigured() {
 function updateSetupBanner() {
   const banner = document.getElementById('setup-banner');
   const binDisplay = document.getElementById('bin-id-display');
-  binDisplay.textContent = getBinId() || '—';
+  binDisplay.textContent = localStorage.getItem(STORAGE_KEY_BIN) || '—';
   if (isConfigured()) {
     banner.style.display = 'none';
     document.getElementById('refresh-indicator').style.display = 'flex';
@@ -691,10 +665,10 @@ function updateSetupBanner() {
 
 function saveBinKey() {
   const key = document.getElementById('bin-key-input').value.trim();
-  if (!key) { alert('Collez votre clé API JSONBin.io.'); return; }
+  if (!key) { alert('Collez votre X-Master-Key JSONBin.io.'); return; }
   localStorage.setItem(STORAGE_KEY_API, key);
   updateSetupBanner();
-  if (!getBinId()) {
+  if (!localStorage.getItem(STORAGE_KEY_BIN)) {
     createNewBin();
   } else {
     loadVotes(true);
@@ -703,8 +677,8 @@ function saveBinKey() {
 
 /* ── create a new bin ── */
 async function createNewBin() {
-  const key = getApiKey();
-  if (!key) { alert('Enregistrez d\'abord votre clé API.'); return; }
+  const key = localStorage.getItem(STORAGE_KEY_API) || getApiKey();
+  if (!key) { alert('Enregistrez d\'abord votre X-Master-Key.'); return; }
   showLoading('Création du bin…');
   try {
     const res = await fetch(`${JSONBIN_BASE}/b`, {
@@ -717,15 +691,19 @@ async function createNewBin() {
       },
       body: JSON.stringify({ votes: {} })
     });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error('HTTP ' + res.status + ' — ' + txt);
+    }
     const data = await res.json();
     const newId = data.metadata.id;
     localStorage.setItem(STORAGE_KEY_BIN, newId);
     votes = {};
     updateSetupBanner();
+    buildQRGrid(); // Regenerate QR codes with the new BIN ID embedded
     updateVoteStatus();
     startAutoRefresh();
-    alert('✅ Bin créé ! ID : ' + newId + '\nPartagez ce fichier index.html — tout le monde utilisera le même bin automatiquement dès que vous configurerez la même clé.');
+    alert('✅ Bin créé ! ID : ' + newId + '\n\nLes QR codes ont été mis à jour — ils contiennent maintenant le BIN ID et la clé, donc les participants peuvent voter depuis leur téléphone sans configuration supplémentaire.');
   } catch(e) {
     alert('Erreur lors de la création du bin : ' + e.message);
   } finally {
@@ -755,7 +733,7 @@ async function loadVotes(showSpinner) {
 /* ── save votes to bin ── */
 async function saveVotes() {
   if (!isConfigured()) {
-    // Fallback: save to localStorage if not configured
+    // Fallback: save to localStorage only
     localStorage.setItem('sgd_votes_local', JSON.stringify(votes));
     return;
   }
@@ -813,11 +791,28 @@ function buildAdmin() {
   startAutoRefresh();
 }
 
+/*
+ * FIX: QR codes now embed bid (BIN ID) and bkey (API key) in the URL.
+ * When a participant scans the QR code, their browser receives all the
+ * credentials needed to read from and write to the shared JSONBin — 
+ * no manual configuration required on their device.
+ *
+ * Example URL generated:
+ *   https://…/index.html?voter=Cardoso&bid=68abc123&bkey=$2a$10$…
+ */
 function buildQRGrid() {
   const grid = document.getElementById('qr-grid');
   grid.innerHTML = '';
+
+  const storedBinId  = localStorage.getItem(STORAGE_KEY_BIN)  || '';
+  const storedApiKey = localStorage.getItem(STORAGE_KEY_API) || '';
+
   PARTICIPANTS.forEach(p => {
-    const url = getBaseUrl() + '?voter=' + encodeURIComponent(p.name);
+    // Build URL — include bin credentials if available so QR works cross-device
+    let url = getBaseUrl() + '?voter=' + encodeURIComponent(p.name);
+    if (storedBinId)  url += '&bid='  + encodeURIComponent(storedBinId);
+    if (storedApiKey) url += '&bkey=' + encodeURIComponent(storedApiKey);
+
     const card = document.createElement('div');
     card.className = 'qr-card';
     card.innerHTML = `
@@ -828,10 +823,12 @@ function buildQRGrid() {
       <div class="qr-url">${url}</div>
     `;
     grid.appendChild(card);
+
     setTimeout(() => {
       try {
         new QRCode(document.getElementById('qr-' + p.name), {
-          text: url, width: 90, height: 90,
+          text: url,
+          width: 90, height: 90,
           colorDark: '#042C53', colorLight: '#ffffff',
           correctLevel: QRCode.CorrectLevel.M
         });
@@ -913,8 +910,7 @@ function goToDefauts() {
 }
 
 async function submitVote() {
-  // Load latest votes first to avoid overwriting other votes
-  await loadVotes(false);
+  await loadVotes(false); // Load latest to avoid overwriting other votes
   votes[currentVoter] = { qualites: [...selQ], defauts: [...selD] };
   await saveVotes();
   document.getElementById('merci-name').textContent = 'Merci ' + currentVoter + ' !';
@@ -1018,19 +1014,12 @@ async function resetAll() {
 (async function init() {
   showLoading('Chargement…');
 
-  // Try to recover locally-saved votes if JSONBin not configured yet
-  const localBackup = localStorage.getItem('sgd_votes_local');
-  if (localBackup) {
-    try { votes = JSON.parse(localBackup); } catch(e) {}
-  }
-
-  const urlParams  = new URLSearchParams(window.location.search);
-  const voterParam = urlParams.get('voter');
+  const voterParam = _urlParams.get('voter');
 
   if (voterParam && PARTICIPANTS.find(p => p.name === voterParam)) {
     // ── VOTER FLOW ──
+    // Credentials come from URL params (bid + bkey) embedded in the QR code
     currentVoter = voterParam;
-    // Load latest votes to check if this person already voted
     await loadVotes(false);
     hideLoading();
     if (votes[currentVoter]) {
@@ -1041,6 +1030,7 @@ async function resetAll() {
     }
   } else {
     // ── ADMIN FLOW ──
+    // Credentials come from localStorage
     await loadVotes(false);
     hideLoading();
     buildAdmin();
